@@ -7,6 +7,7 @@ import About from '@/components/About';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Helmet } from 'react-helmet';
 
 const Index = () => {
   // Animation handler for scroll animations
@@ -38,8 +39,99 @@ const Index = () => {
     };
   }, []);
 
+  // Structured data for local business
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "HomeAndConstructionBusiness",
+    "name": "Precision Drywall",
+    "image": [
+      "https://precisiondrywall.com/hero-bg.jpg",
+      "https://precisiondrywall.com/about-img.jpg"
+    ],
+    "@id": "https://precisiondrywall.com",
+    "url": "https://precisiondrywall.com",
+    "telephone": "(734) 555-1234",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Main Street",
+      "addressLocality": "Livonia",
+      "addressRegion": "MI",
+      "postalCode": "48150",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 42.3680,
+      "longitude": -83.3732
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Saturday",
+        "opens": "09:00",
+        "closes": "14:00"
+      }
+    ],
+    "sameAs": [
+      "https://www.facebook.com/precisiondrywall",
+      "https://www.instagram.com/precisiondrywall",
+      "https://twitter.com/precision_drywall"
+    ],
+    "priceRange": "$$",
+    "servesCuisine": "Drywall Installation and Repair",
+    "areaServed": [
+      {
+        "@type": "City",
+        "name": "Livonia"
+      },
+      {
+        "@type": "City",
+        "name": "Dearborn"
+      },
+      {
+        "@type": "City",
+        "name": "Farmington Hills"
+      },
+      {
+        "@type": "City",
+        "name": "Redford"
+      },
+      {
+        "@type": "City",
+        "name": "Northville"
+      },
+      {
+        "@type": "City",
+        "name": "Plymouth"
+      },
+      {
+        "@type": "City",
+        "name": "Canton"
+      }
+    ]
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <Helmet>
+        <title>Precision Drywall Services | Professional Drywall Installation & Repair in Livonia, MI</title>
+        <meta name="description" content="Top-rated drywall contractor serving Livonia, Dearborn, Farmington Hills, Plymouth, Canton, and surrounding areas. Professional installation, repairs, and finishing." />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
       <Navbar />
       <Hero />
       <Services />

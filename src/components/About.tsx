@@ -36,10 +36,10 @@ const About = () => {
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-brand-darkBlue">About Precision Drywall</h2>
             <div className="w-20 h-1 bg-brand-blue mb-6"></div>
             <p className="text-lg text-gray-600 mb-6">
-              Precision Drywall is a professional drywall company serving Livonia, Michigan and surrounding communities. With years of experience in the industry, we specialize in providing high-quality drywall installation, repair, and finishing services for both residential and commercial clients.
+              Precision Drywall is a professional drywall company proudly serving Livonia, Michigan and surrounding communities including Dearborn, Farmington Hills, Redford, Northville, Plymouth, and Canton. With over 15 years of experience in the industry, we specialize in providing high-quality drywall installation, repair, and finishing services for both residential and commercial clients.
             </p>
             <p className="text-lg text-gray-600 mb-8">
-              Our team of skilled professionals is committed to delivering exceptional results on every project, big or small. We take pride in our attention to detail, timely service, and competitive pricing.
+              As your local drywall contractor, our team of skilled professionals is committed to delivering exceptional results on every project, big or small. We take pride in our attention to detail, timely service, and competitive pricing. When you're searching for "drywall near me" in the Metro Detroit area, Precision Drywall should be your first choice.
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -92,7 +92,7 @@ const About = () => {
             <div className="relative z-10 rounded-lg overflow-hidden shadow-xl">
               <img 
                 src="/about-img.jpg" 
-                alt="Precision Drywall team at work" 
+                alt="Precision Drywall team at work in Livonia, Michigan" 
                 className="w-full h-auto object-cover"
               />
             </div>
