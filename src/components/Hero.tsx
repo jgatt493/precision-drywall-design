@@ -18,10 +18,10 @@ const Hero = () => {
           Precision Drywall Services
         </h1>
         <h2 className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto font-light animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          Professional drywall installation and repair serving Livonia, Dearborn, Farmington Hills, Redford, Northville, Plymouth, and Canton
+          Professional drywall installation and repair serving the Metro Detroit area
         </h2>
         <p className="text-lg mb-8 max-w-3xl mx-auto font-light animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          Your trusted local drywall contractor for over 15 years
+          Your trusted local drywall contractor
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <Button 

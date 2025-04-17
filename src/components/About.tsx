@@ -36,10 +36,10 @@ const About = () => {
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-brand-darkBlue">About Precision Drywall</h2>
             <div className="w-20 h-1 bg-brand-blue mb-6"></div>
             <p className="text-lg text-gray-600 mb-6">
-              Precision Drywall is a professional drywall company proudly serving Livonia, Michigan and surrounding communities including Dearborn, Farmington Hills, Redford, Northville, Plymouth, and Canton. With over 15 years of experience in the industry, we specialize in providing high-quality drywall installation, repair, and finishing services for both residential and commercial clients.
+              Precision Drywall is a professional drywall company proudly serving Livonia, Michigan and surrounding communities. We specialize in providing high-quality drywall installation, repair, and finishing services for both residential and commercial clients.
             </p>
             <p className="text-lg text-gray-600 mb-8">
-              As your local drywall contractor, our team of skilled professionals is committed to delivering exceptional results on every project, big or small. We take pride in our attention to detail, timely service, and competitive pricing. When you're searching for "drywall near me" in the Metro Detroit area, Precision Drywall should be your first choice.
+              As your local drywall contractor, we are committed to delivering exceptional results on every project, big or small. We take pride in our attention to detail, timely service, and competitive pricing. Whether you are finally fishing the basement or need an emergency fix, if you are in the Metro Detroit area, Precision Drywall should be your first call!
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -82,7 +82,7 @@ const About = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Call us anytime</p>
-                  <p className="text-lg font-semibold text-brand-darkBlue">(734) 555-1234</p>
+                  <p className="text-lg font-semibold text-brand-darkBlue">(248) 802-6533</p>
                 </div>
               </div>
             </div>
