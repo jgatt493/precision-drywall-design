@@ -26,6 +26,9 @@ jobs:
         env:
           VITE_BASE: /precision-drywall-design/ # Use VITE_BASE for Vite's base option
 
+      - name: List dist contents
+        run: ls -al ./dist
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
