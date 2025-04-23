@@ -1,5 +1,6 @@
 import {defineConfig} from "vite";
 import react from "@vitejs/plugin-react-swc";
+import path from 'path'; // Import the 'path' module
 
 
 // Get the repository name from environment variable (for GitHub Actions)
@@ -10,8 +11,13 @@ const base = process.env.NODE_ENV === 'production' ? repoName : '/';
 
 export default defineConfig({
   plugins: [react()],
-  base: base, // Set the base option here
+  base: base,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
   build: {
-    outDir: 'dist', // Default output directory for Vite build
+    outDir: 'dist',
   },
 });
