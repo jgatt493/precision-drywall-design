@@ -31,19 +31,18 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          # Configure Git user
-          git config user.email "github-actions@github.com"
-          git config user.name "GitHub Actions"
-          # Switch to the deployment branch
           git checkout --orphan gh-pages
-          git reset --hard
-          git status
+          
+          mkdir -p temp_deploy
+          cp -r ./dist/* temp_deploy/
           ls -al
-          # Remove all files EXCEPT the dist folder
-          find . -maxdepth 1 -not -name 'dist' -exec rm -rf {} +
-          # Copy the built site into the deployment branch's working directory
+          # Remove all files and directories in the current working directory (gh-pages)
+          find . -maxdepth 1 -not -name 'temp_deploy' -not -name '.' -exec rm -rf {} +
+          # Copy the built site from the temporary directory to the root of gh-pages
+          cp -r temp_deploy/* .
+          # Remove the temporary directory
           ls -al
-          cp -r ./dist/* .
-          git add .
+          rm -rf temp_deploy
+          git add --all .
           git commit -m "Deploy website"
-          # git push origin gh-pages --force
+          git push origin gh-pages --force
