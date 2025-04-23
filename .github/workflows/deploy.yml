@@ -29,9 +29,17 @@ jobs:
       - name: List dist contents
         run: ls -al ./dist
 
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-checkout # Checkout into a separate directory
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages # The branch where your built site will be deployed
-          folder: dist # The default output folder for Vite build
+          branch: gh-pages
+          folder: dist
+          target-folder: . # Deploy directly to the root of the gh-pages branch
+          clean: true # Clean the gh-pages branch before deploying
