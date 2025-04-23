@@ -28,5 +28,5 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          npx gh-pages -d dist -b gh-pages --repo "https://github.com/${{ github.repository }}.git"
+          npx gh-pages -d dist -b gh-pages --repo "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
         working-directory: ./
