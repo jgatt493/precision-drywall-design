@@ -31,7 +31,10 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          # Copy the built site first
+          # Configure Git user
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          # Copy the built site
           cp -r ./dist/* .
           git checkout --orphan gh-pages
           git reset --hard
