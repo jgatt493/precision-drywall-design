@@ -45,7 +45,8 @@ const Contact = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch('/api/contact', {
+            // NEW: Call Supabase Edge Function (instead of /api/contact)
+            const response = await fetch('/functions/send-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
