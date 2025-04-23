@@ -203,7 +203,7 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-brand-darkBlue mb-1">Email Address</h4>
-                                        <p className="text-gray-600">info@precisiondrywall.com</p>
+                                        <p className="text-gray-600">support@precisiondrywall.com</p>
                                     </div>
                                 </div>
 
