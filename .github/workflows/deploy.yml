@@ -37,7 +37,7 @@ jobs:
           cp -r ./dist/* temp_deploy/
           ls -al
           # Remove all files and directories in the current working directory (gh-pages)
-          find . -maxdepth 1 -not -name 'temp_deploy' -not -name '.' -not name '.git' -exec rm -rf {} +
+          find . -maxdepth 1 -not -name 'temp_deploy' -not -name '.' -not -name '.git' -exec rm -rf {} +
           # Copy the built site from the temporary directory to the root of gh-pages
           ls -al
           cp -r temp_deploy/* .
