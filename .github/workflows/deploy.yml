@@ -3,12 +3,11 @@ name: Deploy Vite React App to GitHub Pages
 on:
   push:
     branches:
-      - main # Or your main development branch
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -16,30 +15,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*' # Use the latest LTS version of Node.js
+          node-version: 'lts/*'
 
       - name: Install Dependencies
-        run: npm install # Or yarn install or pnpm install
+        run: npm install
 
       - name: Build Application
         run: npm run build
         env:
-          VITE_BASE: /precision-drywall-design/ # Use VITE_BASE for Vite's base option
-
-      - name: List dist contents
-        run: ls -al ./dist
-
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-checkout # Checkout into a separate directory
+          VITE_BASE: /precision-drywall-design/
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: dist
-          target-folder: . # Deploy directly to the root of the gh-pages branch
-          clean: true # Clean the gh-pages branch before deploying
+        run: |
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          npx gh-pages -d dist -b gh-pages --repo https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
