@@ -33,7 +33,9 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git checkout --orphan gh-pages
           git reset --hard
+          ls -al
           rm -rf *
+          ls -al
           cp -r ./dist/* .
           git add .
           git commit -m "Deploy website"
