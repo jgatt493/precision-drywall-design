@@ -32,6 +32,8 @@ jobs:
         run: |
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git checkout --orphan gh-pages
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
           
           mkdir -p temp_deploy
           cp -r ./dist/* temp_deploy/
@@ -44,6 +46,6 @@ jobs:
           # Remove the temporary directory
           ls -al
           rm -rf temp_deploy
-          git add --all .
+          git add .
           git commit -m "Deploy website"
           git push origin gh-pages --force
