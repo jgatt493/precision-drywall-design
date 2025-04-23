@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
+const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/super-endpoint';
+
 const Contact = () => {
     const { toast } = useToast();
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -27,7 +29,7 @@ const Contact = () => {
                     entry.target.classList.add('is-visible');
                 }
             });
-        }, {threshold: 0.1});
+        }, { threshold: 0.1 });
 
         const elements = document.querySelectorAll('.animate-on-scroll');
         elements.forEach(el => observer.observe(el));
@@ -45,8 +47,7 @@ const Contact = () => {
         setIsSubmitting(true);
 
         try {
-            // NEW: Call Supabase Edge Function (instead of /api/contact)
-            const response = await fetch('/functions/send-email', {
+            const response = await fetch(EDGE_FUNCTION_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +56,12 @@ const Contact = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to send message');
+                let errorMsg = 'Failed to send message';
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.error || errorMsg;
+                } catch { /* fallback to default */ }
+                throw new Error(errorMsg);
             }
 
             toast({
@@ -158,7 +164,7 @@ const Contact = () => {
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? 'Sending...' : 'Send Message'}
-                                    <Send className="ml-2 h-4 w-4"/>
+                                    <Send className="ml-2 h-4 w-4" />
                                 </Button>
                             </form>
                         </CardContent>
@@ -175,7 +181,7 @@ const Contact = () => {
                             <div className="space-y-6">
                                 <div className="flex items-start">
                                     <div className="bg-brand-blue/10 p-3 rounded-full mr-4">
-                                        <Phone className="h-6 w-6 text-brand-blue"/>
+                                        <Phone className="h-6 w-6 text-brand-blue" />
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-brand-darkBlue mb-1">Phone Number</h4>
@@ -185,7 +191,7 @@ const Contact = () => {
 
                                 <div className="flex items-start">
                                     <div className="bg-brand-blue/10 p-3 rounded-full mr-4">
-                                        <Mail className="h-6 w-6 text-brand-blue"/>
+                                        <Mail className="h-6 w-6 text-brand-blue" />
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-brand-darkBlue mb-1">Email Address</h4>
@@ -195,7 +201,7 @@ const Contact = () => {
 
                                 <div className="flex items-start">
                                     <div className="bg-brand-blue/10 p-3 rounded-full mr-4">
-                                        <Clock className="h-6 w-6 text-brand-blue"/>
+                                        <Clock className="h-6 w-6 text-brand-blue" />
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-brand-darkBlue mb-1">Response Time</h4>
