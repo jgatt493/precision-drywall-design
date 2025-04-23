@@ -10,14 +10,19 @@ function getEnvVar(key: string): string {
 }
 
 serve(async (req) => {
+  // Log request details for debugging
+  console.log(`Request method: ${req.method}`);
+  console.log(`Request headers:`, Object.fromEntries(req.headers.entries()));
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Handling OPTIONS request (CORS preflight)");
     return new Response(null, {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
       },
     });
   }
@@ -37,11 +42,22 @@ serve(async (req) => {
   // Parse request body
   let formData;
   try {
-    formData = await req.json();
-    console.log("Received form data:", formData);
+    const bodyText = await req.text();
+    console.log("Raw request body:", bodyText);
+    
+    try {
+      formData = JSON.parse(bodyText);
+      console.log("Parsed form data:", formData);
+    } catch (jsonErr) {
+      console.error("Failed to parse JSON, trying URL-encoded format");
+      // Try to parse as URL-encoded form data
+      const params = new URLSearchParams(bodyText);
+      formData = Object.fromEntries(params.entries());
+      console.log("Parsed from URL-encoded:", formData);
+    }
   } catch (err) {
-    console.error("Error parsing JSON:", err);
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), {
+    console.error("Error parsing request body:", err);
+    return new Response(JSON.stringify({ error: "Invalid request body" }), {
       status: 400,
       headers: { 
         "Content-Type": "application/json",
@@ -63,6 +79,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Preparing to send email...");
     // Read secrets from environment (these should be configured in Supabase project secrets)
     const smtpHost = getEnvVar("SMTP_HOST");
     const smtpPort = parseInt(getEnvVar("SMTP_PORT"), 10); // e.g. 587 
@@ -70,7 +87,7 @@ serve(async (req) => {
     const smtpPass = getEnvVar("SMTP_PASS");
     const recipient = getEnvVar("CONTACT_RECIPIENT"); // Where to send received messages
 
-    console.log(`SMTP config: ${smtpHost}:${smtpPort}`);
+    console.log(`SMTP config: ${smtpHost}:${smtpPort}, user: ${smtpUser}, recipient: ${recipient}`);
 
     // Set up nodemailer transport for Zoho
     const transporter = createTransport({
@@ -81,6 +98,7 @@ serve(async (req) => {
         user: smtpUser,
         pass: smtpPass,
       },
+      debug: true, // Enable debug output
     });
 
     const mailOptions = {
@@ -105,7 +123,8 @@ serve(async (req) => {
     };
 
     console.log("Sending email to:", recipient);
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully:", info);
     
     return new Response(JSON.stringify({ success: true }), {
       headers: { 
