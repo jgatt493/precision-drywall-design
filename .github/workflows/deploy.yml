@@ -22,9 +22,9 @@ jobs:
         run: npm install # Or yarn install or pnpm install
 
       - name: Build Application
-        run: npm run build # Or yarn build or pnpm build
+        run: npm run build
         env:
-          BASE_URL: /precision-drywall-design/ # Only needed for project sites, adjust if necessary
+          VITE_BASE: /precision-drywall-design/ # Use VITE_BASE for Vite's base option
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
