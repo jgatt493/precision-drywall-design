@@ -25,6 +25,9 @@ jobs:
         env:
           VITE_BASE: /precision-drywall-design/
 
+      - name: List Workspace Contents
+        run: ls -al
+
       - name: Deploy to GitHub Pages
         run: |
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
