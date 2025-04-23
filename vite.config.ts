@@ -11,7 +11,7 @@ const base = process.env.NODE_ENV === 'production' ? repoName : '/';
 
 export default defineConfig({
   plugins: [react()],
-  base: base,
+  base: '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
