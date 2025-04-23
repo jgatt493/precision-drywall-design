@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/super-endpoint';
+const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/send-email';
 
 const Contact = () => {
     const { toast } = useToast();
@@ -47,6 +47,9 @@ const Contact = () => {
         setIsSubmitting(true);
 
         try {
+            console.log('Sending request to:', EDGE_FUNCTION_ENDPOINT);
+            console.log('With data:', formData);
+            
             const response = await fetch(EDGE_FUNCTION_ENDPOINT, {
                 method: 'POST',
                 headers: {
@@ -55,12 +58,17 @@ const Contact = () => {
                 body: JSON.stringify(formData),
             });
 
+            console.log('Response status:', response.status);
+            
             if (!response.ok) {
                 let errorMsg = 'Failed to send message';
                 try {
                     const errorData = await response.json();
+                    console.log('Error data:', errorData);
                     errorMsg = errorData.error || errorMsg;
-                } catch { /* fallback to default */ }
+                } catch (err) { 
+                    console.error('Error parsing error response:', err);
+                }
                 throw new Error(errorMsg);
             }
 
@@ -79,7 +87,7 @@ const Contact = () => {
             console.error('Error sending message:', error);
             toast({
                 title: "Error",
-                description: "Failed to send message. Please try again later.",
+                description: error instanceof Error ? error.message : "Failed to send message. Please try again later.",
                 variant: "destructive"
             });
         } finally {
