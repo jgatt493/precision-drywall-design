@@ -1,13 +1,59 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createTransport } from "npm:nodemailer@6.9.11";
-import { multiParser } from "https://deno.land/x/multiparser@0.1.18/mod.ts";
 
 // Helper to safely read env variables / secrets
 function getEnvVar(key) {
   const value = Deno.env.get(key) || "";
   if (!value) throw new Error(`Missing environment variable: ${key}`);
   return value;
+}
+
+// Simple multipart form-data parser since the external dependency is causing issues
+async function parseMultipartFormData(request) {
+  const contentType = request.headers.get("content-type") || "";
+  const boundary = contentType.match(/boundary=([^;]+)/)?.[1];
+  
+  if (!boundary) {
+    throw new Error("No boundary found in multipart form-data");
+  }
+  
+  const data = await request.arrayBuffer();
+  const decoder = new TextDecoder();
+  const text = decoder.decode(data);
+  const parts = text.split(`--${boundary}`);
+  
+  const formData = {};
+  let attachment = null;
+  
+  for (const part of parts) {
+    if (!part.trim() || part.includes('--\r\n')) continue;
+    
+    const [headersText, ...bodyParts] = part.split('\r\n\r\n');
+    const bodyContent = bodyParts.join('\r\n\r\n');
+    
+    // Parse headers
+    const headerMatch = headersText.match(/name="([^"]+)"/);
+    const fieldName = headerMatch ? headerMatch[1] : null;
+    
+    if (!fieldName) continue;
+    
+    // Check if this part contains a file
+    const filenameMatch = headersText.match(/filename="([^"]+)"/);
+    const contentTypeMatch = headersText.match(/Content-Type: ([^\r\n]+)/);
+    
+    if (filenameMatch && contentTypeMatch && fieldName === 'attachment') {
+      attachment = {
+        filename: filenameMatch[1],
+        content: bodyContent.trim(),
+        contentType: contentTypeMatch[1]
+      };
+    } else if (fieldName) {
+      // Regular form field
+      formData[fieldName] = bodyContent.trim();
+    }
+  }
+  
+  return { fields: formData, attachment };
 }
 
 serve(async (req) => {
@@ -48,28 +94,21 @@ serve(async (req) => {
   try {
     if (contentType.includes("multipart/form-data")) {
       console.log("Parsing multipart form data");
-      // Parse multipart form data
-      const form = await multiParser(req);
+      // Parse multipart form data using our custom parser
+      const parsedData = await parseMultipartFormData(req);
       
       // Extract form fields
       formData = {
-        name: form.fields.name || "",
-        email: form.fields.email || "",
-        phone: form.fields.phone || "",
-        message: form.fields.message || ""
+        name: parsedData.fields.name || "",
+        email: parsedData.fields.email || "",
+        phone: parsedData.fields.phone || "",
+        message: parsedData.fields.message || ""
       };
       
       // Extract file attachment if present
-      if (form.files && form.files.attachment) {
-        const file = form.files.attachment;
-        console.log("File attached:", file.filename);
-        
-        // Read file content
-        attachment = {
-          filename: file.filename,
-          content: file.content,
-          contentType: file.contentType
-        };
+      if (parsedData.attachment) {
+        attachment = parsedData.attachment;
+        console.log("File attached:", attachment.filename);
       }
       
       console.log("Parsed form data:", formData);
@@ -142,27 +181,27 @@ serve(async (req) => {
     });
     
     const mailOptions = {
-      from: `"${name}" <${smtpUser}>`,
+      from: `"${formData.name}" <${smtpUser}>`,
       to: [
         recipient1,
         recipient2
       ],
-      subject: `Contact Form Submission from ${name}`,
+      subject: `Contact Form Submission from ${formData.name}`,
       text: `
-        Name: ${name}
-        Email: ${email}
-        Phone: ${phone || "Not provided"}
-        Message: ${message}
+        Name: ${formData.name}
+        Email: ${formData.email}
+        Phone: ${formData.phone || "Not provided"}
+        Message: ${formData.message}
       `,
       html: `
         <h2>Contact Form Submission</h2>
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Phone:</b> ${phone || "Not provided"}</p>
+        <p><b>Name:</b> ${formData.name}</p>
+        <p><b>Email:</b> ${formData.email}</p>
+        <p><b>Phone:</b> ${formData.phone || "Not provided"}</p>
         <p><b>Message:</b></p>
-        <p>${message}</p>
+        <p>${formData.message}</p>
       `,
-      replyTo: email,
+      replyTo: formData.email,
       attachments: attachment ? [
         {
           filename: attachment.filename,
