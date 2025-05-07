@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createTransport } from "npm:nodemailer@6.9.11";
 
@@ -42,11 +43,17 @@ async function parseMultipartFormData(request) {
     const contentTypeMatch = headersText.match(/Content-Type: ([^\r\n]+)/);
     
     if (filenameMatch && contentTypeMatch && fieldName === 'attachment') {
+      // For binary files like images, we need to properly encode the data
+      const binaryContent = bodyContent.trim();
+      
       attachment = {
         filename: filenameMatch[1],
-        content: bodyContent.trim(),
-        contentType: contentTypeMatch[1]
+        content: Buffer.from(binaryContent, 'binary'),
+        contentType: contentTypeMatch[1],
+        encoding: 'base64'
       };
+      
+      console.log(`Attachment detected: ${filenameMatch[1]} (${contentTypeMatch[1]})`);
     } else if (fieldName) {
       // Regular form field
       formData[fieldName] = bodyContent.trim();
@@ -108,7 +115,7 @@ serve(async (req) => {
       // Extract file attachment if present
       if (parsedData.attachment) {
         attachment = parsedData.attachment;
-        console.log("File attached:", attachment.filename);
+        console.log("File attached:", attachment.filename, "with content type:", attachment.contentType);
       }
       
       console.log("Parsed form data:", formData);
@@ -180,6 +187,18 @@ serve(async (req) => {
       }
     });
     
+    let attachmentConfig = [];
+    
+    if (attachment) {
+      console.log(`Processing attachment: ${attachment.filename} (${attachment.contentType})`);
+      attachmentConfig = [{
+        filename: attachment.filename,
+        content: attachment.content,
+        contentType: attachment.contentType,
+        encoding: attachment.encoding
+      }];
+    }
+    
     const mailOptions = {
       from: `"${formData.name}" <${smtpUser}>`,
       to: [
@@ -202,13 +221,7 @@ serve(async (req) => {
         <p>${formData.message}</p>
       `,
       replyTo: formData.email,
-      attachments: attachment ? [
-        {
-          filename: attachment.filename,
-          content: attachment.content,
-          contentType: attachment.contentType
-        }
-      ] : []
+      attachments: attachmentConfig
     };
     
     console.log("Sending email to:", recipient1, " and ", recipient2);

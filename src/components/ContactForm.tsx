@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Send, Paperclip, Camera } from 'lucide-react';
+import { Send, Paperclip, Camera, XCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatPhoneNumber } from '@/utils/formatters';
 
-const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/super-endpoint';
+const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/send-email';
 
 interface ContactFormData {
     name: string;
@@ -44,10 +44,21 @@ const ContactForm: React.FC = () => {
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setAttachment(e.target.files[0]);
+            const file = e.target.files[0];
+            // Check if file size exceeds 10MB (10 * 1024 * 1024 bytes)
+            if (file.size > 10 * 1024 * 1024) {
+                toast({
+                    title: "File Too Large",
+                    description: "Please select a file smaller than 10MB",
+                    variant: "destructive"
+                });
+                return;
+            }
+            
+            setAttachment(file);
             toast({
                 title: "File Attached",
-                description: `${e.target.files[0].name} will be sent with your message.`,
+                description: `${file.name} will be sent with your message.`,
             });
         }
     };
@@ -73,6 +84,10 @@ const ContactForm: React.FC = () => {
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+        toast({
+            title: "Attachment Removed",
+            description: "Your file has been removed.",
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -230,18 +245,24 @@ const ContactForm: React.FC = () => {
                                 </div>
                                 
                                 {attachment && (
-                                    <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md mt-2">
-                                        <div className="text-sm text-gray-700 truncate">
-                                            {attachment.name}
+                                    <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md mt-2">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="text-sm text-gray-700 truncate max-w-xs">
+                                                {attachment.name}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                                            </div>
                                         </div>
                                         <Button
                                             type="button"
                                             variant="ghost"
                                             size="sm"
                                             onClick={handleRemoveAttachment}
-                                            className="text-gray-500 hover:text-red-500"
+                                            className="text-gray-500 hover:text-red-500 p-1"
                                         >
-                                            Remove
+                                            <XCircle className="h-4 w-4" />
+                                            <span className="sr-only">Remove</span>
                                         </Button>
                                     </div>
                                 )}
