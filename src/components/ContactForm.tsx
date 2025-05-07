@@ -9,7 +9,7 @@ import { Send, Paperclip, Camera } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatPhoneNumber } from '@/utils/formatters';
 
-const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/send-email';
+const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/super-endpoint';
 
 interface ContactFormData {
     name: string;
