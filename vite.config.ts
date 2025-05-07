@@ -1,3 +1,4 @@
+
 import {defineConfig} from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from 'path'; // Import the 'path' module
@@ -20,4 +21,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
+  server: {
+    port: 8080
+  }
 });
