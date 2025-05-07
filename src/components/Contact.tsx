@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, Paperclip, Camera } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/super-endpoint'
@@ -12,7 +12,9 @@ const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functio
 const Contact = () => {
     const { toast } = useToast();
     const sectionRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [attachment, setAttachment] = useState<File | null>(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -36,9 +38,62 @@ const Contact = () => {
         return () => elements.forEach(el => observer.unobserve(el));
     }, []);
 
+    const formatPhoneNumber = (input: string): string => {
+        // Strip all non-numeric characters
+        const phoneNumber = input.replace(/\D/g, '');
+        
+        // Format according to length
+        if (phoneNumber.length <= 3) {
+            return phoneNumber;
+        } else if (phoneNumber.length <= 6) {
+            return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+        } else {
+            return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        
+        if (name === 'phone') {
+            // Apply formatting to phone number
+            setFormData(prev => ({ ...prev, [name]: formatPhoneNumber(value) }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setAttachment(e.target.files[0]);
+            toast({
+                title: "File Attached",
+                description: `${e.target.files[0].name} will be sent with your message.`,
+            });
+        }
+    };
+
+    const handleCameraClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.accept = 'image/*';
+            fileInputRef.current.capture = 'environment';
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileUploadClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.accept = '*/*';
+            fileInputRef.current.removeAttribute('capture');
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleRemoveAttachment = () => {
+        setAttachment(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -46,15 +101,38 @@ const Contact = () => {
         setIsSubmitting(true);
 
         try {
+            // Create FormData object to handle file attachments
+            const messageFormData = new FormData();
+            messageFormData.append('name', formData.name);
+            messageFormData.append('email', formData.email);
+            if (formData.phone) messageFormData.append('phone', formData.phone);
+            messageFormData.append('message', formData.message);
+            
+            // Add file if present
+            if (attachment) {
+                messageFormData.append('attachment', attachment);
+            }
+
             console.log('Sending request to:', EDGE_FUNCTION_ENDPOINT);
-            console.log('With data:', formData);
+            console.log('With data:', Object.fromEntries(messageFormData.entries()));
+            
+            // Use JSON for compatibility with current edge function
+            // Note: To handle file uploads, the edge function would need to be updated
+            // to handle multipart/form-data. For now, we'll keep using JSON.
+            const jsonData = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone || 'Not provided',
+                message: formData.message,
+                attachmentName: attachment ? attachment.name : 'None'
+            };
             
             const response = await fetch(EDGE_FUNCTION_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(jsonData),
                 credentials: 'omit',
             });
 
@@ -83,6 +161,9 @@ const Contact = () => {
                 phone: '',
                 message: ''
             });
+            setAttachment(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            
         } catch (error) {
             console.error('Error sending message:', error);
             toast({
@@ -140,14 +221,13 @@ const Contact = () => {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="phone">Phone Number</Label>
+                                            <Label htmlFor="phone">Phone Number (Optional)</Label>
                                             <Input
                                                 id="phone"
                                                 name="phone"
                                                 placeholder="(123) 456-7890"
                                                 value={formData.phone}
                                                 onChange={handleChange}
-                                                required
                                             />
                                         </div>
                                     </div>
@@ -163,6 +243,57 @@ const Contact = () => {
                                             onChange={handleChange}
                                             required
                                         />
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <Label>Attachments (Optional)</Label>
+                                        <div className="flex flex-col space-y-2">
+                                            <input 
+                                                type="file" 
+                                                ref={fileInputRef} 
+                                                className="hidden" 
+                                                onChange={handleFileChange}
+                                            />
+                                            
+                                            <div className="flex space-x-2">
+                                                <Button 
+                                                    type="button" 
+                                                    variant="outline"
+                                                    className="flex items-center text-brand-blue"
+                                                    onClick={handleFileUploadClick}
+                                                >
+                                                    <Paperclip className="mr-2 h-4 w-4" />
+                                                    Upload File
+                                                </Button>
+                                                
+                                                <Button 
+                                                    type="button" 
+                                                    variant="outline"
+                                                    className="flex items-center text-brand-blue"
+                                                    onClick={handleCameraClick}
+                                                >
+                                                    <Camera className="mr-2 h-4 w-4" />
+                                                    Take Picture
+                                                </Button>
+                                            </div>
+                                            
+                                            {attachment && (
+                                                <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md mt-2">
+                                                    <div className="text-sm text-gray-700 truncate">
+                                                        {attachment.name}
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={handleRemoveAttachment}
+                                                        className="text-gray-500 hover:text-red-500"
+                                                    >
+                                                        Remove
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
