@@ -49,7 +49,7 @@ const Index = () => {
     ],
     "@id": "https://precisiondrywall.com",
     "url": "https://precisiondrywall.com",
-    "telephone": "(734) 555-1234",
+    "telephone": "(248) 802-6533",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "123 Main Street",

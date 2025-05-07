@@ -91,7 +91,7 @@ const Navbar = () => {
               'font-medium',
               isScrolled ? 'text-brand-darkBlue' : 'text-white'
             )}>
-              (734) 555-1234
+              (248) 802-6533
             </span>
           </div>
           <Button 
@@ -146,7 +146,7 @@ const Navbar = () => {
             <div className="flex items-center py-2">
               <Phone size={18} className="text-brand-blue mr-2" />
               <span className="font-medium text-brand-darkBlue">
-                (734) 555-1234
+                (248) 802-6533
               </span>
             </div>
             <Button 

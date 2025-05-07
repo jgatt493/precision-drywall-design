@@ -43,7 +43,7 @@ const About = () => {
                         <p className="text-lg text-gray-600 mb-8">
                             As your local drywall contractor, we are committed to delivering exceptional results on
                             every project, big or small. We take pride in our attention to detail, timely service, and
-                            competitive pricing. Whether you are finally fishing the basement or need an emergency fix,
+                            competitive pricing. Whether you are finally finishing the basement or need an emergency fix,
                             if you are in the Metro Detroit area, Precision Drywall should be your first call!
                         </p>
 
