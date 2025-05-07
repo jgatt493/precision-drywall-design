@@ -9,7 +9,7 @@ import { Send, Paperclip, Camera } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatPhoneNumber } from '@/utils/formatters';
 
-const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/super-endpoint';
+const EDGE_FUNCTION_ENDPOINT = 'https://oodtywkclflclzeuctgu.supabase.co/functions/v1/send-email';
 
 interface ContactFormData {
     name: string;
@@ -93,23 +93,10 @@ const ContactForm: React.FC = () => {
             }
 
             console.log('Sending request to:', EDGE_FUNCTION_ENDPOINT);
-            console.log('With data:', Object.fromEntries(messageFormData.entries()));
-            
-            // Use JSON for compatibility with current edge function
-            const jsonData = {
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone || 'Not provided',
-                message: formData.message,
-                attachmentName: attachment ? attachment.name : 'None'
-            };
             
             const response = await fetch(EDGE_FUNCTION_ENDPOINT, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(jsonData),
+                body: messageFormData,
                 credentials: 'omit',
             });
 
